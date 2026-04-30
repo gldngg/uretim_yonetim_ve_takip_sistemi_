@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.Color;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
@@ -10,9 +11,11 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -31,6 +34,9 @@ import model.Planlama;
 import model.Siparis;
 import service.PlanlamaService;
 import service.SiparisService;
+import javax.swing.table.TableColumn;
+import model.Makine;
+import service.MakineService;
 
 public class SiparisEkrani extends JFrame {
 
@@ -48,6 +54,7 @@ public class SiparisEkrani extends JFrame {
 
     private SiparisService siparisService = new SiparisService();
     private PlanlamaService planlamaService = new PlanlamaService();
+    private MakineService makineService = new MakineService();
 
     private final Color ARKA_PLAN = new Color(142, 155, 213);
     private final Color HEADER = new Color(63, 81, 181);
@@ -137,7 +144,7 @@ public class SiparisEkrani extends JFrame {
         JLabel lblKullanici = new JLabel(Session.aktifKullanici);
         lblKullanici.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lblKullanici.setForeground(Color.WHITE);
-        lblKullanici.setBounds(840, 24, 100, 20);
+        lblKullanici.setBounds(850, 24, 160, 20);
         panelUstMenu.add(lblKullanici);
 
         JButton btnCikis = new JButton("ÇIKIŞ");
@@ -272,8 +279,20 @@ public class SiparisEkrani extends JFrame {
 
         txtTarih = textFieldOlustur();
         txtTarih.setText("gg.aa.yyyy");
-        txtTarih.setBounds(410, 225, 375, 30);
+        txtTarih.setEditable(false);
+        txtTarih.setBounds(410, 225, 255, 30);
         panelAna.add(txtTarih);
+
+        JButton btnTarihSec = new JButton("Tarih Seç");
+        btnTarihSec.setBounds(675, 225, 110, 30);
+        btnTarihSec.setBackground(BUTON_MAVI);
+        btnTarihSec.setForeground(Color.WHITE);
+        btnTarihSec.setFont(new Font("Tahoma", Font.BOLD, 13));
+        btnTarihSec.setBorderPainted(false);
+        btnTarihSec.setFocusPainted(false);
+        panelAna.add(btnTarihSec);
+
+        btnTarihSec.addActionListener(e -> tarihSec());
 
         lblDurum = new JLabel("Durum :");
         lblDurum.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -286,6 +305,8 @@ public class SiparisEkrani extends JFrame {
         table.setRowHeight(25);
         table.getTableHeader().setBackground(new Color(230, 235, 250));
         table.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 13));
+        
+        makineKolonunuComboBoxYap();
 
         JScrollPane tableScroll = new JScrollPane(table);
         tableScroll.setBounds(10, 300, 775, 210);
@@ -344,6 +365,87 @@ public class SiparisEkrani extends JFrame {
         txt.setBorder(new CompoundBorder(new LineBorder(HEADER, 2, true), new EmptyBorder(2, 5, 2, 2)));
         return txt;
     }
+
+    private void tarihSec() {
+        JComboBox<Integer> gunBox = new JComboBox<>();
+        JComboBox<Integer> ayBox = new JComboBox<>();
+        JComboBox<Integer> yilBox = new JComboBox<>();
+
+        for (int i = 1; i <= 12; i++) {
+            ayBox.addItem(i);
+        }
+
+        for (int i = 2025; i <= 2035; i++) {
+            yilBox.addItem(i);
+        }
+
+        ayBox.addActionListener(e -> gunleriGuncelle(gunBox, ayBox, yilBox));
+        yilBox.addActionListener(e -> gunleriGuncelle(gunBox, ayBox, yilBox));
+
+        gunleriGuncelle(gunBox, ayBox, yilBox);
+
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Gün:"));
+        panel.add(gunBox);
+        panel.add(new JLabel("Ay:"));
+        panel.add(ayBox);
+        panel.add(new JLabel("Yıl:"));
+        panel.add(yilBox);
+
+        int sonuc = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "Termin Tarihi Seç",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (sonuc == JOptionPane.OK_OPTION) {
+            int gun = (int) gunBox.getSelectedItem();
+            int ay = (int) ayBox.getSelectedItem();
+            int yil = (int) yilBox.getSelectedItem();
+
+            txtTarih.setText(String.format("%02d.%02d.%04d", gun, ay, yil));
+        }
+    }
+    
+    private void gunleriGuncelle(JComboBox<Integer> gunBox, JComboBox<Integer> ayBox, JComboBox<Integer> yilBox) {
+        int seciliGun = gunBox.getSelectedItem() == null ? 1 : (int) gunBox.getSelectedItem();
+        int ay = (int) ayBox.getSelectedItem();
+        int yil = (int) yilBox.getSelectedItem();
+
+        int gunSayisi = ayinGunSayisi(ay, yil);
+
+        gunBox.removeAllItems();
+
+        for (int i = 1; i <= gunSayisi; i++) {
+            gunBox.addItem(i);
+        }
+
+        if (seciliGun <= gunSayisi) {
+            gunBox.setSelectedItem(seciliGun);
+        } else {
+            gunBox.setSelectedItem(gunSayisi);
+        }
+    }
+
+    private int ayinGunSayisi(int ay, int yil) {
+        if (ay == 2) {
+            if (yil % 4 == 0) {
+                return 29;
+            } else {
+                return 28;
+            }
+        }
+
+        if (ay == 4 || ay == 6 || ay == 9 || ay == 11) {
+            return 30;
+        }
+
+        return 31;
+    }
+
+     
 
     private void kaydetVeyaGuncelle() {
         if (table.isEditing()) {
@@ -411,6 +513,11 @@ public class SiparisEkrani extends JFrame {
             return false;
         }
 
+        if (txtTarih.getText().trim().equals("gg.aa.yyyy")) {
+            lblDurum.setText("Durum: Termin tarihi seçiniz.");
+            return false;
+        }
+
         return true;
     }
 
@@ -426,7 +533,6 @@ public class SiparisEkrani extends JFrame {
             }
 
             String gorev = gorevObj.toString();
-
             String makine = "Belirtilmedi";
 
             if (makineObj != null && !makineObj.toString().equals("Makine Seçin")) {
@@ -504,6 +610,22 @@ public class SiparisEkrani extends JFrame {
         }
     }
 
+    
+    private void makineKolonunuComboBoxYap() {
+        JComboBox<String> makineComboBox = new JComboBox<>();
+
+        makineComboBox.addItem("Makine Seçin");
+
+        List<Makine> makineler = makineService.tumMakineleriGetir();
+
+        for (Makine makine : makineler) {
+            makineComboBox.addItem(makine.getMakineKodu());
+        }
+
+        TableColumn makineColumn = table.getColumnModel().getColumn(2);
+        makineColumn.setCellEditor(new javax.swing.DefaultCellEditor(makineComboBox));
+    }
+    
     public static void main(String[] args) {
         new SiparisEkrani().setVisible(true);
     }
