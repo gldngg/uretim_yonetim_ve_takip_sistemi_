@@ -171,7 +171,7 @@ public class MakineGirisEkrani extends JFrame {
         JLabel lblKullanici = new JLabel(Session.aktifKullanici);
         lblKullanici.setFont(new Font("Tahoma", Font.PLAIN, 12));
         lblKullanici.setForeground(Color.WHITE);
-        lblKullanici.setBounds(830, 24, 130, 20);
+        lblKullanici.setBounds(850, 24, 160, 20);
         panelUstMenu.add(lblKullanici);
 
         JButton btnCikis = new JButton("ÇIKIŞ");
