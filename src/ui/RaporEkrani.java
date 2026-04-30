@@ -118,11 +118,11 @@ public class RaporEkrani extends JFrame {
             dispose();
         });
 
-        JLabel lblUser = new JLabel(Session.aktifKullanici);
-        lblUser.setBounds(840, 20, 100, 25);
-        lblUser.setForeground(Color.WHITE);
-        lblUser.setFont(new Font("Tahoma", Font.BOLD, 12));
-        panelUstMenu.add(lblUser);
+        JLabel lblKullanici = new JLabel(Session.aktifKullanici);
+        lblKullanici.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        lblKullanici.setForeground(Color.WHITE);
+        lblKullanici.setBounds(850, 24, 160, 20);
+        panelUstMenu.add(lblKullanici);
 
         JButton btnCikis = new JButton("ÇIKIŞ");
         btnCikis.setBounds(950, 18, 70, 30);
