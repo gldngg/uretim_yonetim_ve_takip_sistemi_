@@ -2,6 +2,7 @@ package service;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,8 @@ public class PlanlamaService implements IPlanlamaIslemleri {
 
     @Override
     public boolean planlamaEkle(Planlama planlama) {
-        String sql = "INSERT INTO is_emirleri (siparis_id, gorev, makine, plan_tarihi, durum) "
+        String sql = "INSERT INTO is_emirleri "
+                + "(siparis_id, gorev, makine, plan_tarihi, durum) "
                 + "VALUES (?, ?, ?, ?, ?)";
 
         try {
@@ -65,7 +67,6 @@ public class PlanlamaService implements IPlanlamaIslemleri {
 
         try {
             PreparedStatement pstmt = Veritabani.getInstance().getConnection().prepareStatement(sql);
-
             pstmt.setInt(1, siparisId);
             pstmt.executeUpdate();
             pstmt.close();
@@ -80,11 +81,12 @@ public class PlanlamaService implements IPlanlamaIslemleri {
 
     @Override
     public List<Planlama> siparisPlanlamalariniGetir(int siparisId) {
-        List<Planlama> planlamalar = new ArrayList<>();
+        List<Planlama> liste = new ArrayList<>();
 
-        String sql = "SELECT i.*, s.siparis_kodu FROM is_emirleri i "
-                + "LEFT JOIN siparisler s ON i.siparis_id = s.id "
-                + "WHERE i.siparis_id = ?";
+        String sql = "SELECT ie.*, s.siparis_kodu, s.urun_adi "
+                + "FROM is_emirleri ie "
+                + "LEFT JOIN siparisler s ON ie.siparis_id = s.id "
+                + "WHERE ie.siparis_id = ?";
 
         try {
             PreparedStatement pstmt = Veritabani.getInstance().getConnection().prepareStatement(sql);
@@ -93,10 +95,11 @@ public class PlanlamaService implements IPlanlamaIslemleri {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                planlamalar.add(new Planlama(
+                liste.add(new Planlama(
                         rs.getInt("id"),
                         rs.getInt("siparis_id"),
                         rs.getString("siparis_kodu"),
+                        rs.getString("urun_adi"),
                         rs.getString("gorev"),
                         rs.getString("makine"),
                         rs.getString("plan_tarihi"),
@@ -108,29 +111,31 @@ public class PlanlamaService implements IPlanlamaIslemleri {
             pstmt.close();
 
         } catch (Exception e) {
-            System.err.println("Planlama listeleme hatası: " + e.getMessage());
+            System.err.println("Sipariş planlamaları getirme hatası: " + e.getMessage());
         }
 
-        return planlamalar;
+        return liste;
     }
 
     @Override
     public List<Planlama> tumPlanlamalariGetir() {
-        List<Planlama> planlamalar = new ArrayList<>();
+        List<Planlama> liste = new ArrayList<>();
 
-        String sql = "SELECT i.*, s.siparis_kodu FROM is_emirleri i "
-                + "LEFT JOIN siparisler s ON i.siparis_id = s.id "
-                + "ORDER BY i.id DESC";
+        String sql = "SELECT ie.*, s.siparis_kodu, s.urun_adi "
+                + "FROM is_emirleri ie "
+                + "LEFT JOIN siparisler s ON ie.siparis_id = s.id "
+                + "ORDER BY ie.id DESC";
 
         try {
             PreparedStatement pstmt = Veritabani.getInstance().getConnection().prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                planlamalar.add(new Planlama(
+                liste.add(new Planlama(
                         rs.getInt("id"),
                         rs.getInt("siparis_id"),
                         rs.getString("siparis_kodu"),
+                        rs.getString("urun_adi"),
                         rs.getString("gorev"),
                         rs.getString("makine"),
                         rs.getString("plan_tarihi"),
@@ -145,6 +150,53 @@ public class PlanlamaService implements IPlanlamaIslemleri {
             System.err.println("Tüm planlamaları getirme hatası: " + e.getMessage());
         }
 
-        return planlamalar;
+        return liste;
+    }
+
+    @Override
+    public int makineAdediGetir() {
+        String sql = "SELECT COUNT(*) FROM machines";
+
+        try {
+            Statement stmt = Veritabani.getInstance().getConnection().createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            int sayi = 0;
+
+            if (rs.next()) {
+                sayi = rs.getInt(1);
+            }
+
+            rs.close();
+            stmt.close();
+
+            return sayi;
+
+        } catch (Exception e) {
+            System.err.println("Makine sayısı alma hatası: " + e.getMessage());
+            return 0;
+        }
+    }
+    public boolean planlamaTarihDurumGuncelle(int id, String planTarihi, String durum) {
+        String sql = "UPDATE is_emirleri SET plan_tarihi = ?, durum = ? WHERE id = ?";
+
+        try {
+            java.sql.PreparedStatement pstmt = database.Veritabani.getInstance()
+                    .getConnection()
+                    .prepareStatement(sql);
+
+            pstmt.setString(1, planTarihi);
+            pstmt.setString(2, durum);
+            pstmt.setInt(3, id);
+
+            pstmt.executeUpdate();
+            pstmt.close();
+
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Planlama tarih/durum güncelleme hatası: " + e.getMessage());
+            return false;
+        }
     }
 }
