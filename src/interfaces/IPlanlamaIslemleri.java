@@ -14,4 +14,6 @@ public interface IPlanlamaIslemleri {
     List<Planlama> siparisPlanlamalariniGetir(int siparisId);
 
     List<Planlama> tumPlanlamalariGetir();
+
+    int makineAdediGetir();
 }
