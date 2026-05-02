@@ -77,6 +77,7 @@ public class GirisEkrani extends JFrame {
 
         textfUserName = new JTextField();
         textfUserName.setBounds(280, 30, 400, 35);
+        textfUserName.setFont(new Font("Tahoma", Font.BOLD, 18));
         loginPanel.add(textfUserName);
 
         JLabel lblPassword = new JLabel("Şifre:");
