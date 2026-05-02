@@ -32,11 +32,15 @@ import database.Session;
 import model.Planlama;
 import service.PlanlamaService;
 
-public class PlanlamaEkrani extends JFrame {
+import java.awt.Image;
+import javax.swing.ImageIcon;
+
+import javax.swing.SwingConstants;
+
+
+public class PlanlamaEkrani extends OrtakEkran {
 
     private static final long serialVersionUID = 1L;
-
-    private JPanel contentPane;
 
     private String takvimModu = "HAFTA";
     private LocalDate seciliTarih = LocalDate.now();
@@ -66,116 +70,20 @@ public class PlanlamaEkrani extends JFrame {
     private static final DateTimeFormatter TR_FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final Locale TR_LOCALE = new Locale("tr", "TR");
 
-    private final Color ARKA_PLAN = new Color(142, 155, 213);
-    private final Color HEADER = new Color(63, 81, 181);
-    private final Color PANEL_BEYAZ = Color.WHITE;
-    private final Color ACIK_GRI = new Color(245, 245, 245);
-    private final Color BUTON_MAVI = new Color(52, 152, 219);
+  
 
     public static void main(String[] args) {
         new PlanlamaEkrani().setVisible(true);
     }
 
     public PlanlamaEkrani() {
-
+    	 super("Üretim Planlama");
         haftaBasi = LocalDate.now().with(DayOfWeek.MONDAY);
+        ustMenuOlustur("PLANLAMA");
 
-        setTitle("Üretim Planlama");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1100, 760);
-        setResizable(false);
-        setLocationRelativeTo(null);
-
-        contentPane = new JPanel();
-        contentPane.setLayout(null);
-        contentPane.setBackground(ARKA_PLAN);
-        setContentPane(contentPane);
-
-        JPanel panelUstMenu = new JPanel();
-        panelUstMenu.setBounds(30, 20, 1040, 70);
-        panelUstMenu.setBackground(HEADER);
-        panelUstMenu.setLayout(null);
-        contentPane.add(panelUstMenu);
-
-        JLabel lblLogo = new JLabel("LOGO");
-        lblLogo.setBounds(10, 18, 40, 28);
-        lblLogo.setForeground(Color.WHITE);
-        panelUstMenu.add(lblLogo);
-
-        JLabel lblBaslik = new JLabel("Üretim Planlama");
-        lblBaslik.setBounds(50, 18, 220, 30);
-        lblBaslik.setForeground(Color.WHITE);
-        lblBaslik.setFont(new Font("Tahoma", Font.BOLD, 20));
-        panelUstMenu.add(lblBaslik);
-
-        JButton btnAnaSayfa = menuButonu("Ana Sayfa");
-        btnAnaSayfa.setBounds(250, 20, 100, 25);
-        panelUstMenu.add(btnAnaSayfa);
-
-        btnAnaSayfa.addActionListener(e -> {
-            if ("Admin".equals(Session.aktifRol)) {
-                new AdminMenuEkrani().setVisible(true);
-            } else {
-                new OperatorMenuEkrani().setVisible(true);
-            }
-            dispose();
-        });
-
-        JButton btnDurusKayip = menuButonu("Duruş/Kayıp");
-        btnDurusKayip.setBounds(360, 20, 120, 25);
-        panelUstMenu.add(btnDurusKayip);
-
-        btnDurusKayip.addActionListener(e -> {
-            new DurusKayipEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnMakineGirisi = menuButonu("Makine Girişi");
-        btnMakineGirisi.setBounds(480, 20, 120, 25);
-        panelUstMenu.add(btnMakineGirisi);
-
-        btnMakineGirisi.addActionListener(e -> {
-            new MakineGirisEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnSiparis = menuButonu("Sipariş");
-        btnSiparis.setBounds(600, 20, 100, 25);
-        panelUstMenu.add(btnSiparis);
-
-        btnSiparis.addActionListener(e -> {
-            new SiparisEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnRapor = menuButonu("Rapor");
-        btnRapor.setBounds(700, 20, 80, 25);
-        panelUstMenu.add(btnRapor);
-
-        btnRapor.addActionListener(e -> {
-            new RaporEkrani().setVisible(true);
-            dispose();
-        });
-
-        JLabel lblUser = new JLabel(Session.aktifKullanici);
-        lblUser.setBounds(830, 24, 130, 20);
-        lblUser.setForeground(Color.WHITE);
-        lblUser.setFont(new Font("Tahoma", Font.BOLD, 12));
-        panelUstMenu.add(lblUser);
-
-        JButton btnCikis = new JButton("ÇIKIŞ");
-        btnCikis.setBounds(950, 18, 70, 30);
-        btnCikis.setForeground(Color.BLACK);
-        btnCikis.setFont(new Font("Tahoma", Font.BOLD, 11));
-        panelUstMenu.add(btnCikis);
-
-        btnCikis.addActionListener(e -> {
-            Session.aktifKullanici = "";
-            Session.aktifRol = "";
-            new GirisEkrani().setVisible(true);
-            dispose();
-        });
-
+        boolean operatorMu = "operator".equalsIgnoreCase(Session.aktifRol)
+                || "operatör".equalsIgnoreCase(Session.aktifRol);
+        
         JPanel panelTakvim = new JPanel();
         panelTakvim.setBounds(30, 100, 1040, 250);
         panelTakvim.setBackground(PANEL_BEYAZ);
@@ -333,6 +241,11 @@ public class PlanlamaEkrani extends JFrame {
         isEmriTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
+
+                if (operatorMu) {
+                    return;
+                }
+
                 int satir = isEmriTable.getSelectedRow();
 
                 if (satir != -1) {
@@ -356,11 +269,22 @@ public class PlanlamaEkrani extends JFrame {
         panelIsEmri.add(lblPlanTarihi);
 
         txtPlanTarihi = new JTextField("gg.aa.yyyy");
-        txtPlanTarihi.setBounds(100, 240, 120, 25);
+        txtPlanTarihi.setBounds(100, 240, 100, 25);
+        txtPlanTarihi.setEditable(false);
         panelIsEmri.add(txtPlanTarihi);
 
+        JButton btnTarihSec = new JButton("Tarih Seç");
+        btnTarihSec.setBounds(205, 240, 95, 25);
+        btnTarihSec.setBackground(BUTON_MAVI);
+        btnTarihSec.setForeground(Color.WHITE);
+        btnTarihSec.setFocusPainted(false);
+        btnTarihSec.setBorderPainted(false);
+        panelIsEmri.add(btnTarihSec);
+
+        btnTarihSec.addActionListener(e -> tarihSec());
+
         JLabel lblDurumSec = new JLabel("Durum:");
-        lblDurumSec.setBounds(240, 240, 60, 25);
+        lblDurumSec.setBounds(315, 240, 60, 25);
         panelIsEmri.add(lblDurumSec);
 
         cmbDurum = new JComboBox<>(new String[]{
@@ -369,11 +293,13 @@ public class PlanlamaEkrani extends JFrame {
                 "Üretimde",
                 "Tamamlandı"
         });
-        cmbDurum.setBounds(300, 240, 130, 25);
+        cmbDurum.setBounds(370, 240, 130, 25);
         panelIsEmri.add(cmbDurum);
 
         JButton btnPlanGuncelle = new JButton("Güncelle");
-        btnPlanGuncelle.setBounds(460, 240, 120, 25);
+        btnPlanGuncelle.setBounds(515, 240, 120, 25);
+        
+        
         btnPlanGuncelle.setBackground(BUTON_MAVI);
         btnPlanGuncelle.setForeground(Color.WHITE);
         btnPlanGuncelle.setFocusPainted(false);
@@ -382,6 +308,18 @@ public class PlanlamaEkrani extends JFrame {
 
         btnPlanGuncelle.addActionListener(e -> planlamaGuncelle());
 
+        if (operatorMu) {
+            lblPlanTarihi.setVisible(false);
+            txtPlanTarihi.setVisible(false);
+            btnTarihSec.setVisible(false);
+
+            lblDurumSec.setVisible(false);
+            cmbDurum.setVisible(false);
+
+            btnPlanGuncelle.setVisible(false);
+        }
+        
+        
         JPanel panelKaynak = new JPanel();
         panelKaynak.setBounds(700, 370, 370, 300);
         panelKaynak.setBackground(PANEL_BEYAZ);
@@ -478,15 +416,7 @@ public class PlanlamaEkrani extends JFrame {
         verileriYukle();
     }
 
-    private JButton menuButonu(String text) {
-        JButton btn = new JButton(text);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Tahoma", Font.BOLD, 13));
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        return btn;
-    }
+    
 
     private void tabloyuAyarla() {
 
@@ -617,6 +547,84 @@ public class PlanlamaEkrani extends JFrame {
                 return;
             }
         }
+    }
+    private void tarihSec() {
+        JComboBox<Integer> gunBox = new JComboBox<>();
+        JComboBox<Integer> ayBox = new JComboBox<>();
+        JComboBox<Integer> yilBox = new JComboBox<>();
+
+        for (int i = 1; i <= 12; i++) {
+            ayBox.addItem(i);
+        }
+
+        for (int i = 2025; i <= 2035; i++) {
+            yilBox.addItem(i);
+        }
+
+        ayBox.addActionListener(e -> gunleriGuncelle(gunBox, ayBox, yilBox));
+        yilBox.addActionListener(e -> gunleriGuncelle(gunBox, ayBox, yilBox));
+
+        gunleriGuncelle(gunBox, ayBox, yilBox);
+
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Gün:"));
+        panel.add(gunBox);
+        panel.add(new JLabel("Ay:"));
+        panel.add(ayBox);
+        panel.add(new JLabel("Yıl:"));
+        panel.add(yilBox);
+
+        int sonuc = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "Plan Tarihi Seç",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (sonuc == JOptionPane.OK_OPTION) {
+            int gun = (int) gunBox.getSelectedItem();
+            int ay = (int) ayBox.getSelectedItem();
+            int yil = (int) yilBox.getSelectedItem();
+
+            txtPlanTarihi.setText(String.format("%02d.%02d.%04d", gun, ay, yil));
+        }
+    }
+
+    private void gunleriGuncelle(JComboBox<Integer> gunBox, JComboBox<Integer> ayBox, JComboBox<Integer> yilBox) {
+        int seciliGun = gunBox.getSelectedItem() == null ? 1 : (int) gunBox.getSelectedItem();
+        int ay = (int) ayBox.getSelectedItem();
+        int yil = (int) yilBox.getSelectedItem();
+
+        int gunSayisi = ayinGunSayisi(ay, yil);
+
+        gunBox.removeAllItems();
+
+        for (int i = 1; i <= gunSayisi; i++) {
+            gunBox.addItem(i);
+        }
+
+        if (seciliGun <= gunSayisi) {
+            gunBox.setSelectedItem(seciliGun);
+        } else {
+            gunBox.setSelectedItem(gunSayisi);
+        }
+    }
+
+    private int ayinGunSayisi(int ay, int yil) {
+        if (ay == 2) {
+            if (yil % 4 == 0) {
+                return 29;
+            } else {
+                return 28;
+            }
+        }
+
+        if (ay == 4 || ay == 6 || ay == 9 || ay == 11) {
+            return 30;
+        }
+
+        return 31;
     }
 
     private void planlamaGuncelle() {
@@ -769,21 +777,136 @@ public class PlanlamaEkrani extends JFrame {
 
             String v = value != null ? value.toString() : "";
 
-            if ("Üretimde".equals(v)) {
-                lbl.setBackground(new Color(40, 167, 69));
+            if ("Tamamlandı".equals(v)) {
+                lbl.setBackground(new Color(0, 123, 255));
                 lbl.setForeground(Color.WHITE);
             } else if ("Planlandı".equals(v)) {
                 lbl.setBackground(new Color(255, 152, 0));
                 lbl.setForeground(Color.WHITE);
-            } else if ("Tamamlandı".equals(v)) {
-                lbl.setBackground(new Color(108, 117, 125));
+            } else if ("Üretimde".equals(v)) {
+                lbl.setBackground(new Color(220, 53, 69));
                 lbl.setForeground(Color.WHITE);
             } else {
                 lbl.setBackground(Color.WHITE);
                 lbl.setForeground(Color.BLACK);
             }
-
             return lbl;
         }
+    }
+    private void ustMenuOlustur(String baslik) {
+
+        JPanel panelUstMenu = new JPanel();
+        panelUstMenu.setBounds(30, 20, 1040, 70);
+        panelUstMenu.setBackground(HEADER);
+        panelUstMenu.setLayout(null);
+        contentPane.add(panelUstMenu);
+
+        boolean adminMi = "admin".equalsIgnoreCase(Session.aktifRol);
+        boolean operatorMu = "operator".equalsIgnoreCase(Session.aktifRol)
+                || "operatör".equalsIgnoreCase(Session.aktifRol);
+
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/ui/logo.png"));
+        Image logoImg = logoIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+        JLabel lblLogo = new JLabel(new ImageIcon(logoImg));
+        lblLogo.setBounds(20, 10, 50, 50);
+        panelUstMenu.add(lblLogo);
+
+        JLabel lblBaslik = new JLabel(baslik);
+        lblBaslik.setBounds(85, 18, 220, 30);
+
+        
+        lblBaslik.setForeground(Color.WHITE);
+        lblBaslik.setFont(new Font("Tahoma", Font.BOLD, 20));
+        panelUstMenu.add(lblBaslik);
+
+        int x = 280;
+        int y = 20;
+        int h = 25;
+
+        JButton btnAnaSayfa = menuButonu("Ana Sayfa");
+        btnAnaSayfa.setBounds(x, y, 100, h);
+        panelUstMenu.add(btnAnaSayfa);
+
+        btnAnaSayfa.addActionListener(e -> {
+            if (adminMi) {
+                new AdminMenuEkrani().setVisible(true);
+            } else {
+                new OperatorMenuEkrani().setVisible(true);
+            }
+            dispose();
+        });
+
+        x += 110;
+
+        // Admin Duruş/Kayıp görmeyecek
+        if (!adminMi) {
+            JButton btnDurusKayip = menuButonu("Duruş/Kayıp");
+            btnDurusKayip.setBounds(x, y, 120, h);
+            panelUstMenu.add(btnDurusKayip);
+
+            btnDurusKayip.addActionListener(e -> {
+                new DurusKayipEkrani().setVisible(true);
+                dispose();
+            });
+
+            x += 120;
+        }
+
+        JButton btnMakineGirisi = menuButonu("Makine Girişi");
+        btnMakineGirisi.setBounds(x, y, 135, h);
+        panelUstMenu.add(btnMakineGirisi);
+
+        btnMakineGirisi.addActionListener(e -> {
+            new MakineGirisEkrani().setVisible(true);
+            dispose();
+        });
+
+        x += 140;
+
+        // Operatör Sipariş görmeyecek
+        if (!operatorMu) {
+            JButton btnSiparis = menuButonu("Sipariş");
+            btnSiparis.setBounds(x, y, 90, h);
+            panelUstMenu.add(btnSiparis);
+
+            btnSiparis.addActionListener(e -> {
+                new SiparisEkrani().setVisible(true);
+                dispose();
+            });
+
+            x += 90;
+        }
+
+        
+
+        JButton btnRapor = menuButonu("Rapor");
+        btnRapor.setBounds(x, y, 80, h);
+        panelUstMenu.add(btnRapor);
+
+        btnRapor.addActionListener(e -> {
+            new RaporEkrani().setVisible(true);
+            dispose();
+        });
+
+        JLabel lblUser = new JLabel(Session.aktifKullanici);
+        lblUser.setBounds(860, 24, 80, 20);
+        lblUser.setForeground(Color.WHITE);
+        lblUser.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        lblUser.setHorizontalAlignment(SwingConstants.CENTER);
+        panelUstMenu.add(lblUser);
+        
+        JButton btnCikis = new JButton("ÇIKIŞ");
+        btnCikis.setBounds(950, 18, 70, 30);
+        btnCikis.setForeground(Color.BLACK);
+        btnCikis.setFont(new Font("Tahoma", Font.BOLD, 11));
+        panelUstMenu.add(btnCikis);
+
+        btnCikis.addActionListener(e -> {
+            Session.aktifKullanici = "";
+            Session.aktifRol = "";
+            new GirisEkrani().setVisible(true);
+            dispose();
+        });
     }
 }
