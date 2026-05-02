@@ -1,0 +1,156 @@
+package ui;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import database.Session;
+
+public class MenuPanel extends JPanel {
+
+    private static final long serialVersionUID = 1L;
+
+    public MenuPanel() {
+        this(null, "MENÜ");
+    }
+
+    public MenuPanel(JFrame mevcutEkran, String baslik) {
+
+        setBounds(20, 20, 1040, 70);
+        setBackground(new Color(63, 81, 181));
+        setLayout(null);
+
+        boolean adminMi = "admin".equalsIgnoreCase(Session.aktifRol);
+        boolean operatorMu = "operator".equalsIgnoreCase(Session.aktifRol)
+                || "operatör".equalsIgnoreCase(Session.aktifRol);
+
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/ui/logo.png"));
+        Image logoImg = logoIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+        JLabel lblLogo = new JLabel(new ImageIcon(logoImg));
+        lblLogo.setBounds(20, 10, 50, 50);
+        add(lblLogo);
+
+        JLabel lblBaslik = new JLabel(baslik);
+        lblBaslik.setBounds(85, 18, 250, 30);
+        lblBaslik.setForeground(Color.WHITE);
+        lblBaslik.setFont(new Font("Tahoma", Font.BOLD, 22));
+        add(lblBaslik);
+
+        int x = 330;
+        int y = 20;
+        int h = 25;
+
+        JButton btnAnaSayfa = menuButonu("Ana Sayfa");
+        btnAnaSayfa.setBounds(x, y, 100, h);
+        add(btnAnaSayfa);
+
+        btnAnaSayfa.addActionListener(e -> {
+            if (adminMi) {
+                new AdminMenuEkrani().setVisible(true);
+            } else {
+                new OperatorMenuEkrani().setVisible(true);
+            }
+
+            if (mevcutEkran != null) {
+                mevcutEkran.dispose();
+            }
+        });
+
+        x += 120;
+
+        if (!adminMi) {
+            JButton btnDurusKayip = menuButonu("Duruş/Kayıp");
+            btnDurusKayip.setBounds(x, y, 120, h);
+            add(btnDurusKayip);
+
+            btnDurusKayip.addActionListener(e -> {
+                new DurusKayipEkrani().setVisible(true);
+
+                if (mevcutEkran != null) {
+                    mevcutEkran.dispose();
+                }
+            });
+
+            x += 130;
+        }
+
+        if (!operatorMu) {
+            JButton btnSiparis = menuButonu("Sipariş");
+            btnSiparis.setBounds(x, y, 90, h);
+            add(btnSiparis);
+
+            btnSiparis.addActionListener(e -> {
+                new SiparisEkrani().setVisible(true);
+
+                if (mevcutEkran != null) {
+                    mevcutEkran.dispose();
+                }
+            });
+
+            x += 105;
+        }
+
+        JButton btnPlanlama = menuButonu("Planlama");
+        btnPlanlama.setBounds(x, y, 100, h);
+        add(btnPlanlama);
+
+        btnPlanlama.addActionListener(e -> {
+            new PlanlamaEkrani().setVisible(true);
+
+            if (mevcutEkran != null) {
+                mevcutEkran.dispose();
+            }
+        });
+
+        x += 110;
+
+        JButton btnRapor = menuButonu("Rapor");
+        btnRapor.setBounds(x, y, 80, h);
+        add(btnRapor);
+
+        btnRapor.addActionListener(e -> {
+            new RaporEkrani().setVisible(true);
+
+            if (mevcutEkran != null) {
+                mevcutEkran.dispose();
+            }
+        });
+
+        JLabel lblKullanici = new JLabel(Session.aktifKullanici);
+        lblKullanici.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        lblKullanici.setForeground(Color.WHITE);
+        lblKullanici.setBounds(850, 24, 90, 20);
+        add(lblKullanici);
+
+        JButton btnCikis = new JButton("ÇIKIŞ");
+        btnCikis.setBounds(950, 18, 70, 30);
+        add(btnCikis);
+
+        btnCikis.addActionListener(e -> {
+            Session.aktifKullanici = "";
+            Session.aktifRol = "";
+            new GirisEkrani().setVisible(true);
+
+            if (mevcutEkran != null) {
+                mevcutEkran.dispose();
+            }
+        });
+    }
+
+    private JButton menuButonu(String text) {
+        JButton btn = new JButton(text);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Tahoma", Font.BOLD, 13));
+        return btn;
+    }
+}
