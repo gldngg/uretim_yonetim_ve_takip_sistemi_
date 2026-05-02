@@ -38,11 +38,11 @@ import javax.swing.table.TableColumn;
 import model.Makine;
 import service.MakineService;
 
-public class SiparisEkrani extends JFrame {
+public class SiparisEkrani extends OrtakEkran {
 
     private static final long serialVersionUID = 1L;
 
-    private JPanel contentPane;
+   
     private JTextField txtSiparisAdi, txtTarih, txtSiparisKodu, txtMusteri, textUrun;
     private JSpinner spinnerMiktar;
     private JTable table;
@@ -56,113 +56,18 @@ public class SiparisEkrani extends JFrame {
     private PlanlamaService planlamaService = new PlanlamaService();
     private MakineService makineService = new MakineService();
 
-    private final Color ARKA_PLAN = new Color(142, 155, 213);
-    private final Color HEADER = new Color(63, 81, 181);
-    private final Color BUTON_MAVI = new Color(52, 152, 219);
-    private final Color PANEL_BEYAZ = Color.WHITE;
-    private final Color ACIK_GRI = new Color(245, 245, 245);
     private final Color TEMIZLE_GRI = new Color(220, 220, 220);
-
     public SiparisEkrani() {
 
-        setTitle("Sipariş Girişi");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1100, 700);
-        setLocationRelativeTo(null);
-        setResizable(false);
+    	super("Sipariş Girişi");
 
-        contentPane = new JPanel();
-        contentPane.setBackground(ARKA_PLAN);
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
-        contentPane.setLayout(null);
+    	contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-        JPanel panelUstMenu = new JPanel();
-        panelUstMenu.setBackground(HEADER);
-        panelUstMenu.setBounds(0, 0, 1100, 70);
-        contentPane.add(panelUstMenu);
-        panelUstMenu.setLayout(null);
-
-        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/ui/logo.png"));
-        Image logoImg = logoIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-
-        JLabel lblLogo = new JLabel(new ImageIcon(logoImg));
-        lblLogo.setBounds(20, 10, 50, 50);
-        panelUstMenu.add(lblLogo);
-
-        JLabel lblBaslik = new JLabel("SİPARİŞ");
-        lblBaslik.setBounds(85, 18, 220, 30);
-        lblBaslik.setForeground(Color.WHITE);
-        lblBaslik.setFont(new Font("Tahoma", Font.BOLD, 22));
-        panelUstMenu.add(lblBaslik);
-
-        JButton btnAnaSayfa = menuButonu("Ana Sayfa");
-        btnAnaSayfa.setBounds(250, 22, 100, 25);
-        panelUstMenu.add(btnAnaSayfa);
-
-        btnAnaSayfa.addActionListener(e -> {
-            new AdminMenuEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnDurusKayip = menuButonu("Duruş/Kayıp");
-        btnDurusKayip.setBounds(360, 22, 120, 25);
-        panelUstMenu.add(btnDurusKayip);
-
-        btnDurusKayip.addActionListener(e -> {
-            new DurusKayipEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnMakine = menuButonu("Makine Giriş");
-        btnMakine.setBounds(490, 22, 90, 25);
-        panelUstMenu.add(btnMakine);
-
-        btnMakine.addActionListener(e -> {
-            new MakineGirisEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnPlanlama = menuButonu("Planlama");
-        btnPlanlama.setBounds(590, 22, 100, 25);
-        panelUstMenu.add(btnPlanlama);
-
-        btnPlanlama.addActionListener(e -> {
-            new PlanlamaEkrani().setVisible(true);
-            dispose();
-        });
-
-        JButton btnRapor = menuButonu("Rapor");
-        btnRapor.setBounds(700, 22, 80, 25);
-        panelUstMenu.add(btnRapor);
-
-        btnRapor.addActionListener(e -> {
-            new RaporEkrani().setVisible(true);
-            dispose();
-        });
-
-        JLabel lblKullanici = new JLabel(Session.aktifKullanici);
-        lblKullanici.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        lblKullanici.setForeground(Color.WHITE);
-        lblKullanici.setBounds(850, 24, 160, 20);
-        panelUstMenu.add(lblKullanici);
-
-        JButton btnCikis = new JButton("ÇIKIŞ");
-        btnCikis.setForeground(Color.BLACK);
-        btnCikis.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        btnCikis.setBounds(950, 20, 70, 30);
-        panelUstMenu.add(btnCikis);
-
-        btnCikis.addActionListener(e -> {
-            Session.aktifKullanici = "";
-            Session.aktifRol = "";
-            new GirisEkrani().setVisible(true);
-            dispose();
-        });
+    	ustMenuOlustur("SİPARİŞ");
 
         JPanel panelYan = new JPanel();
         panelYan.setBackground(PANEL_BEYAZ);
-        panelYan.setBounds(20, 90, 225, 560);
+        panelYan.setBounds(20, 110, 225, 560);
         panelYan.setLayout(null);
         contentPane.add(panelYan);
 
@@ -174,6 +79,7 @@ public class SiparisEkrani extends JFrame {
 
         siparisListesi.addListSelectionListener(e -> {
             lblDurum.setText("Durum :");
+
             if (!e.getValueIsAdjusting()) {
                 String secilenSatir = siparisListesi.getSelectedValue();
 
@@ -207,11 +113,23 @@ public class SiparisEkrani extends JFrame {
             formuTemizle();
         });
 
+        JButton btnSiparisSil = new JButton("Sipariş Sil");
+        btnSiparisSil.setBorderPainted(false);
+        btnSiparisSil.setFocusPainted(false);
+        btnSiparisSil.setForeground(Color.WHITE);
+        btnSiparisSil.setBackground(new Color(220, 53, 69));
+        btnSiparisSil.setFont(new Font("Tahoma", Font.BOLD, 14));
+        btnSiparisSil.setBounds(10, 360, 205, 30);
+        panelYan.add(btnSiparisSil);
+
+        btnSiparisSil.addActionListener(e -> siparisSil());
+        
         JPanel panelAna = new JPanel();
         panelAna.setBackground(PANEL_BEYAZ);
-        panelAna.setBounds(270, 90, 795, 560);
+        panelAna.setBounds(270, 110, 795, 560);
         panelAna.setLayout(null);
         contentPane.add(panelAna);
+       
 
         JPanel panelBaslik = new JPanel();
         panelBaslik.setBackground(ACIK_GRI);
@@ -319,7 +237,9 @@ public class SiparisEkrani extends JFrame {
         btnYeniIsEmri.setBackground(BUTON_MAVI);
         btnYeniIsEmri.setBounds(10, 520, 205, 30);
         panelAna.add(btnYeniIsEmri);
-
+       
+        
+        
         btnYeniIsEmri.addActionListener(e -> {
             lblDurum.setText("Durum :");
             DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -348,16 +268,113 @@ public class SiparisEkrani extends JFrame {
 
         listeyiYenile();
     }
+    private void ustMenuOlustur(String baslik) {
 
-    private JButton menuButonu(String text) {
-        JButton btn = new JButton(text);
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Tahoma", Font.BOLD, 13));
-        return btn;
+        JPanel panelUstMenu = new JPanel();
+        panelUstMenu.setBackground(HEADER);
+        panelUstMenu.setBounds(20, 20, 1040, 70);
+        panelUstMenu.setLayout(null);
+        contentPane.add(panelUstMenu);
+
+        boolean adminMi = "admin".equalsIgnoreCase(Session.aktifRol);
+
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/ui/logo.png"));
+        Image logoImg = logoIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+        JLabel lblLogo = new JLabel(new ImageIcon(logoImg));
+        lblLogo.setBounds(20, 10, 50, 50);
+        panelUstMenu.add(lblLogo);
+
+        JLabel lblBaslik = new JLabel(baslik);
+        lblBaslik.setBounds(85, 18, 220, 30);
+        lblBaslik.setForeground(Color.WHITE);
+        lblBaslik.setFont(new Font("Tahoma", Font.BOLD, 22));
+        panelUstMenu.add(lblBaslik);
+
+        int x = 280;
+        int y = 22;
+        int h = 25;
+
+        JButton btnAnaSayfa = menuButonu("Ana Sayfa");
+        btnAnaSayfa.setBounds(x, y, 100, h);
+        panelUstMenu.add(btnAnaSayfa);
+
+        btnAnaSayfa.addActionListener(e -> {
+            if (adminMi) {
+                new AdminMenuEkrani().setVisible(true);
+            } else {
+                new OperatorMenuEkrani().setVisible(true);
+            }
+            dispose();
+        });
+
+        x += 110;
+
+        // Admin Duruş/Kayıp görmeyecek
+        if (!adminMi) {
+            JButton btnDurusKayip = menuButonu("Duruş/Kayıp");
+            btnDurusKayip.setBounds(x, y, 120, h);
+            panelUstMenu.add(btnDurusKayip);
+
+            btnDurusKayip.addActionListener(e -> {
+                new DurusKayipEkrani().setVisible(true);
+                dispose();
+            });
+
+            x += 130;
+        }
+
+        JButton btnMakine = menuButonu("Makine Giriş");
+        btnMakine.setBounds(x, y, 130, h);
+        panelUstMenu.add(btnMakine);
+
+        btnMakine.addActionListener(e -> {
+            new MakineGirisEkrani().setVisible(true);
+            dispose();
+        });
+
+        x += 140;
+
+        JButton btnPlanlama = menuButonu("Planlama");
+        btnPlanlama.setBounds(x, y, 100, h);
+        panelUstMenu.add(btnPlanlama);
+
+        btnPlanlama.addActionListener(e -> {
+            new PlanlamaEkrani().setVisible(true);
+            dispose();
+        });
+
+        x += 110;
+
+        JButton btnRapor = menuButonu("Rapor");
+        btnRapor.setBounds(x, y, 80, h);
+        panelUstMenu.add(btnRapor);
+
+        btnRapor.addActionListener(e -> {
+            new RaporEkrani().setVisible(true);
+            dispose();
+        });
+
+        JLabel lblKullanici = new JLabel(Session.aktifKullanici);
+        lblKullanici.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        lblKullanici.setForeground(Color.WHITE);
+        lblKullanici.setBounds(850, 24, 90, 20);
+        panelUstMenu.add(lblKullanici);
+
+        JButton btnCikis = new JButton("ÇIKIŞ");
+        btnCikis.setForeground(Color.BLACK);
+        btnCikis.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnCikis.setBounds(950, 20, 70, 30);
+        panelUstMenu.add(btnCikis);
+
+        btnCikis.addActionListener(e -> {
+            Session.aktifKullanici = "";
+            Session.aktifRol = "";
+            new GirisEkrani().setVisible(true);
+            dispose();
+        });
     }
+
 
     private JTextField textFieldOlustur() {
         JTextField txt = new JTextField();
@@ -580,6 +597,45 @@ public class SiparisEkrani extends JFrame {
             });
 
             sayac++;
+        }
+    }
+    private void siparisSil() {
+        String secilenSatir = siparisListesi.getSelectedValue();
+
+        if (secilenSatir == null) {
+            lblDurum.setText("Durum : Silmek için listeden bir sipariş seçin.");
+            return;
+        }
+
+        String secilenSiparisKodu = secilenSatir.split(" - ")[0];
+
+        Siparis siparis = siparisService.siparisGetir(secilenSiparisKodu);
+
+        if (siparis == null) {
+            lblDurum.setText("Durum : Sipariş bulunamadı.");
+            return;
+        }
+
+        int cevap = JOptionPane.showConfirmDialog(
+                this,
+                "Seçili sipariş silinsin mi?\n" + secilenSiparisKodu,
+                "Sipariş Sil",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (cevap == JOptionPane.YES_OPTION) {
+
+            planlamaService.siparisPlanlamalariniSil(siparis.getId());
+
+            boolean sonuc = siparisService.siparisSil(siparis.getId());
+
+            if (sonuc) {
+                lblDurum.setText("Durum : Sipariş silindi.");
+                formuTemizle();
+                listeyiYenile();
+            } else {
+                lblDurum.setText("Durum : Sipariş silinemedi.");
+            }
         }
     }
 
