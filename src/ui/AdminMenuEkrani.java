@@ -55,12 +55,12 @@ public class AdminMenuEkrani extends JFrame {
         });
 
         // ORTA ALAN
-        int startX = 120;
+        int startX = 170;
         int iconY = 220;
         int labelY = 350;
-        int gap = 200; // 230 → daha dengeli
-
-        // ICONLAR (KÜÇÜLTÜLDÜ)
+        int gap = 220;
+        
+        // ICONLAR 
         ImageIcon raporIcon = iconOlustur("/ui/raporlar.png");
         ImageIcon makineIcon = iconOlustur("/ui/makineGirisi.png");
         ImageIcon planIcon = iconOlustur("/ui/planlama.png");
