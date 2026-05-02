@@ -1,10 +1,7 @@
 package ui;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -13,199 +10,202 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
+import database.Session;
 import model.Kullanici;
 import service.KullaniciService;
 
-public class KayitEkrani extends JFrame {
+public class GirisEkrani extends JFrame {
+
+    private static final long serialVersionUID = 1L;
 
     private JPanel contentPane;
-    private JTextField usernameInput;
-    private JPasswordField passwordInput;
-    private JPasswordField passwordRepeatInput;
-    private JRadioButton roleAdmin;
-    private JRadioButton roleOperator;
-    private JLabel messageBox;
-    private ButtonGroup roleGroup;
+    private JPanel loginPanel;
+    private JTextField textfUserName;
+    private JPasswordField pfPassword;
+    private JRadioButton rbtnAdmin;
+    private JRadioButton rbtnOperator;
+    private JLabel lblMessage;
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                KayitEkrani frame = new KayitEkrani();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        GirisEkrani frame = new GirisEkrani();
+        frame.setVisible(true);
     }
 
-    public KayitEkrani() {
+    public GirisEkrani() {
 
-        setTitle("Kayıt Ol");
+        setTitle("ÜRETİM YÖNETİM SİSTEMİ(ÜYS)");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setSize(1100, 760);
         setLocationRelativeTo(null);
+
         setResizable(false);
+        setMinimumSize(getSize());
+        setMaximumSize(getSize());
 
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(142, 155, 213));
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
         contentPane.setLayout(null);
+        contentPane.setBackground(new Color(142, 155, 213));
+        setContentPane(contentPane);
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(63, 81, 181));
-        headerPanel.setBounds(0, 0, 1100, 80);
-        contentPane.add(headerPanel);
         headerPanel.setLayout(null);
+        headerPanel.setBackground(new Color(63, 81, 181));
+        headerPanel.setBounds(0, 0, 1100, 100);
+        contentPane.add(headerPanel);
 
-        JLabel lblTitle = new JLabel("Kayıt Ol");
-        lblTitle.setBounds(0, 20, 1100, 40);
-        lblTitle.setFont(new Font("Tahoma", Font.PLAIN, 24));
+        loginPanel = new JPanel();
+        loginPanel.setLayout(null);
+        loginPanel.setBackground(Color.WHITE);
+        loginPanel.setBounds(150, 150, 800, 400);
+        contentPane.add(loginPanel);
+
+        JLabel lblTitle = new JLabel("Sisteme Giriş Ekranı");
+        lblTitle.setBounds(0, 25, 1100, 50);
+        lblTitle.setFont(new Font("Tahoma", Font.BOLD, 20));
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
         headerPanel.add(lblTitle);
 
-        JPanel formPanel = new JPanel();
-        formPanel.setBackground(Color.WHITE);
-        formPanel.setBounds(75, 120, 950, 500);
-        contentPane.add(formPanel);
-        formPanel.setLayout(null);
+        JLabel lblUserName = new JLabel("Kullanıcı Adı:");
+        lblUserName.setBounds(100, 30, 150, 35);
+        lblUserName.setFont(new Font("Tahoma", Font.BOLD, 20));
+        loginPanel.add(lblUserName);
 
-        JLabel lblUser = new JLabel("Kullanıcı Adı :");
-        lblUser.setFont(new Font("Tahoma", Font.PLAIN, 22));
-        lblUser.setBounds(40, 35, 200, 55);
-        formPanel.add(lblUser);
+        textfUserName = new JTextField();
+        textfUserName.setBounds(280, 30, 400, 35);
+        textfUserName.setFont(new Font("Tahoma", Font.BOLD, 18));
+        loginPanel.add(textfUserName);
 
-        usernameInput = new JTextField();
-        usernameInput.setBorder(new CompoundBorder(new LineBorder(Color.BLACK, 2), new EmptyBorder(2, 8, 2, 2)));
-        usernameInput.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        usernameInput.setBounds(300, 35, 590, 55);
-        formPanel.add(usernameInput);
+        JLabel lblPassword = new JLabel("Şifre:");
+        lblPassword.setBounds(100, 90, 150, 35);
+        lblPassword.setFont(new Font("Tahoma", Font.BOLD, 20));
+        loginPanel.add(lblPassword);
 
-        JLabel lblPass = new JLabel("Şifre :");
-        lblPass.setFont(new Font("Tahoma", Font.PLAIN, 22));
-        lblPass.setBounds(40, 110, 200, 55);
-        formPanel.add(lblPass);
+        pfPassword = new JPasswordField();
+        pfPassword.setBounds(280, 90, 400, 35);
+        loginPanel.add(pfPassword);
 
-        passwordInput = new JPasswordField();
-        passwordInput.setBorder(new CompoundBorder(new LineBorder(Color.BLACK, 2), new EmptyBorder(2, 8, 2, 2)));
-        passwordInput.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        passwordInput.setBounds(300, 110, 590, 55);
-        formPanel.add(passwordInput);
+        JLabel lblRole = new JLabel("Rol:");
+        lblRole.setBounds(100, 150, 150, 35);
+        lblRole.setFont(new Font("Tahoma", Font.BOLD, 20));
+        loginPanel.add(lblRole);
 
-        JLabel lblPassRep = new JLabel("Şifre Tekrarı :");
-        lblPassRep.setFont(new Font("Tahoma", Font.PLAIN, 22));
-        lblPassRep.setBounds(40, 185, 200, 55);
-        formPanel.add(lblPassRep);
+        rbtnAdmin = new JRadioButton("Admin");
+        rbtnOperator = new JRadioButton("Operatör");
 
-        passwordRepeatInput = new JPasswordField();
-        passwordRepeatInput.setBorder(new CompoundBorder(new LineBorder(Color.BLACK, 2), new EmptyBorder(2, 8, 2, 2)));
-        passwordRepeatInput.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        passwordRepeatInput.setBounds(300, 185, 590, 55);
-        formPanel.add(passwordRepeatInput);
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(rbtnAdmin);
+        bg.add(rbtnOperator);
 
-        roleAdmin = new JRadioButton("Admin");
-        roleAdmin.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        roleAdmin.setBackground(Color.WHITE);
-        roleAdmin.setBounds(300, 260, 160, 45);
-        formPanel.add(roleAdmin);
+        rbtnAdmin.setBounds(280, 150, 130, 35);
+        rbtnAdmin.setFont(new Font("Tahoma", Font.BOLD, 16));
+        rbtnAdmin.setOpaque(false);
+        loginPanel.add(rbtnAdmin);
 
-        roleOperator = new JRadioButton("Operatör");
-        roleOperator.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        roleOperator.setBackground(Color.WHITE);
-        roleOperator.setBounds(520, 260, 180, 45);
-        formPanel.add(roleOperator);
+        rbtnOperator.setBounds(420, 150, 130, 35);
+        rbtnOperator.setFont(new Font("Tahoma", Font.BOLD, 16));
+        rbtnOperator.setOpaque(false);
+        loginPanel.add(rbtnOperator);
 
-        roleGroup = new ButtonGroup();
-        roleGroup.add(roleAdmin);
-        roleGroup.add(roleOperator);
-
-        JButton btnRegister = new JButton("KAYIT OL");
-        btnRegister.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        btnRegister.setBackground(new Color(63, 81, 181));
-        btnRegister.setForeground(Color.WHITE);
-        btnRegister.setBounds(300, 330, 180, 55);
-        formPanel.add(btnRegister);
-
-        JButton btnLogin = new JButton("GİRİŞ EKRANINA DÖN");
-        btnLogin.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        JButton btnLogin = new JButton("Giriş Yap");
+        btnLogin.setBounds(280, 210, 150, 35);
+        btnLogin.setFont(new Font("Tahoma", Font.BOLD, 20));
         btnLogin.setBackground(new Color(63, 81, 181));
         btnLogin.setForeground(Color.WHITE);
-        btnLogin.setBounds(520, 330, 370, 55);
-        formPanel.add(btnLogin);
+        loginPanel.add(btnLogin);
 
-        JSeparator separator = new JSeparator();
-        separator.setBounds(40, 410, 850, 5);
-        formPanel.add(separator);
+        JButton btnClear = new JButton("Temizle");
+        btnClear.setBounds(450, 210, 150, 35);
+        btnClear.setFont(new Font("Tahoma", Font.BOLD, 20));
+        btnClear.setBackground(new Color(63, 81, 181));
+        btnClear.setForeground(Color.WHITE);
+        loginPanel.add(btnClear);
 
-        messageBox = new JLabel("Durum :");
-        messageBox.setFont(new Font("Tahoma", Font.PLAIN, 22));
-        messageBox.setBounds(40, 425, 850, 55);
-        formPanel.add(messageBox);
+        JLabel messagebox = new JLabel("Durum Mesajı:");
+        messagebox.setBounds(100, 270, 200, 35);
+        messagebox.setFont(new Font("Tahoma", Font.BOLD, 20));
+        loginPanel.add(messagebox);
 
-        btnRegister.addActionListener(e -> kayitIslemi());
-        btnLogin.addActionListener(e -> goToLogin());
+        lblMessage = new JLabel("");
+        lblMessage.setBounds(280, 270, 400, 35);
+        lblMessage.setFont(new Font("Tahoma", Font.BOLD, 16));
+        loginPanel.add(lblMessage);
+
+        JLabel lblRegister = new JLabel("Hesabınız yok mu?");
+        lblRegister.setBounds(200, 330, 200, 35);
+        lblRegister.setFont(new Font("Tahoma", Font.BOLD, 20));
+        loginPanel.add(lblRegister);
+
+        JButton btnRegister = new JButton("Kayıt Ol");
+        btnRegister.setBounds(425, 330, 150, 35);
+        btnRegister.setFont(new Font("Tahoma", Font.BOLD, 20));
+        btnRegister.setBackground(new Color(63, 81, 181));
+        btnRegister.setForeground(Color.WHITE);
+        loginPanel.add(btnRegister);
+
+        btnLogin.addActionListener(e -> girisYap());
+
+        btnClear.addActionListener(e -> {
+            textfUserName.setText("");
+            pfPassword.setText("");
+            lblMessage.setText("");
+            bg.clearSelection();
+        });
+
+        btnRegister.addActionListener(e -> {
+            KayitEkrani kayit = new KayitEkrani();
+            kayit.setVisible(true);
+            dispose();
+        });
     }
 
-    private void kayitIslemi() {
+    private void girisYap() {
 
-        String username = usernameInput.getText().trim();
-        String password = new String(passwordInput.getPassword());
-        String passwordRepeat = new String(passwordRepeatInput.getPassword());
+        String username = textfUserName.getText().trim();
+        String password = new String(pfPassword.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            lblMessage.setText("Kullanıcı adı veya şifre boş bırakılamaz!");
+            return;
+        }
 
         String role = null;
 
-        if (roleAdmin.isSelected()) {
+        if (rbtnAdmin.isSelected()) {
             role = "Admin";
-        } else if (roleOperator.isSelected()) {
+        } else if (rbtnOperator.isSelected()) {
             role = "Operator";
         }
 
-        try {
-
-            if (username.isEmpty() || password.isEmpty() || passwordRepeat.isEmpty() || role == null) {
-                throw new IllegalArgumentException("Boşlukları doldurunuz!");
-            }
-
-            if (!password.equals(passwordRepeat)) {
-                throw new IllegalArgumentException("Şifreyi kontrol ediniz!");
-            }
-
-            KullaniciService service = new KullaniciService();
-            Kullanici kullanici = new Kullanici(0, username, role);
-
-            boolean sonuc = service.kayitOl(kullanici, password);
-
-            if (sonuc) {
-                messageBox.setText("Durum: Kayıt başarılı!");
-
-                Timer timer = new Timer(2000, (ActionEvent e) -> goToLogin());
-                timer.setRepeats(false);
-                timer.start();
-
-            } else {
-                messageBox.setText("Durum: Kullanıcı adı kullanımda!");
-            }
-
-        } catch (IllegalArgumentException e) {
-            messageBox.setText("Durum: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            messageBox.setText("Durum: Hata oluştu!");
+        if (role == null) {
+            lblMessage.setText("Rol seçiniz!");
+            return;
         }
-    }
 
-    private void goToLogin() {
-        new GirisEkrani().setVisible(true);
-        dispose();
+        KullaniciService kullaniciService = new KullaniciService();
+        Kullanici kullanici = kullaniciService.girisYap(username, password, role);
+
+        if (kullanici != null) {
+            Session.aktifKullanici = username;
+            Session.aktifRol = role;
+
+            lblMessage.setText("Giriş başarılı!");
+            System.out.println(kullanici.yetkiBilgisi());
+
+            if (role.equals("Admin")) {
+                new AdminMenuEkrani().setVisible(true);
+            } else {
+                new OperatorMenuEkrani().setVisible(true);
+            }
+
+            dispose();
+
+        } else {
+            lblMessage.setText("Hatalı kullanıcı adı, şifre veya rol!");
+        }
     }
 }
