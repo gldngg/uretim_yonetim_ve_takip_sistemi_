@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import database.Veritabani;
 import interfaces.ISiparisIslemleri;
 import model.Siparis;
@@ -146,5 +145,24 @@ public class SiparisService implements ISiparisIslemleri {
         }
 
         return siparisler;
+    }
+    public boolean siparisSil(int id) {
+        String sql = "DELETE FROM siparisler WHERE id = ?";
+
+        try {
+            PreparedStatement pstmt = Veritabani.getInstance()
+                    .getConnection()
+                    .prepareStatement(sql);
+
+            pstmt.setInt(1, id);
+
+            int sonuc = pstmt.executeUpdate();
+
+            return sonuc > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
