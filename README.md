@@ -30,6 +30,7 @@ Proje Java programlama dili ile geliştirilmiştir. Kullanıcı arayüzü için 
 
 ## Proje Yapısı
 
+```text
 UretimYonetimTakipSistemi
 ├── src
 │   ├── database
