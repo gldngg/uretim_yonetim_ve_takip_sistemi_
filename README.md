@@ -165,18 +165,18 @@ Projede kalıtım yapısı kullanılmıştır.
 Kullanıcı rolleri için:
 
 
-public class Admin extends Kullanici
-public class Operator extends Kullanici
+* public class Admin extends Kullanici
+* public class Operator extends Kullanici
 
 
 Ekran yapıları için:
 
-public class OrtakEkran extends JFrame
-public class SiparisEkrani extends OrtakEkran
-public class PlanlamaEkrani extends OrtakEkran
-public class RaporEkrani extends OrtakEkran
-public class MakineGirisEkrani extends OrtakEkran
-public class DurusKayipEkrani extends OrtakEkran
+* public class OrtakEkran extends JFrame
+* public class SiparisEkrani extends OrtakEkran
+* public class PlanlamaEkrani extends OrtakEkran
+* public class RaporEkrani extends OrtakEkran
+* public class MakineGirisEkrani extends OrtakEkran
+* public class DurusKayipEkrani extends OrtakEkran
 
 
 `OrtakEkran` sınıfı sayesinde işlem ekranlarında kullanılan ortak pencere ayarları, üst menü, renkler ve rol kontrolleri tek merkezde toplanmıştır.
